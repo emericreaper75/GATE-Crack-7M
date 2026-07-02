@@ -1,12 +1,62 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore, LearningNote } from '../store';
 import { SUBJECTS } from '../store/initialData';
 import { Plus, Search, BookOpen, Trash2, Edit3, Bold, Italic, List, Heading1, Heading2, Code, Quote, Eye, Columns, X, Tag } from 'lucide-react';
 import { Badge, Button, Input, Select, Textarea } from '../components/ui';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+import mermaid from 'mermaid';
+
+mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+
+const MermaidDiagram = ({ chart }: { chart: string }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const renderChart = async () => {
+        try {
+          const { svg } = await mermaid.render(`mermaid-${Math.random().toString(36).substring(7)}`, chart);
+          if (containerRef.current) {
+            containerRef.current.innerHTML = svg;
+          }
+        } catch (e) {
+          console.error("Mermaid parsing error", e);
+          if (containerRef.current) {
+            containerRef.current.innerHTML = `<div class="text-accent-danger p-2 border border-accent-danger rounded bg-accent-danger/10">Failed to render diagram</div>`;
+          }
+        }
+      };
+      renderChart();
+    }
+  }, [chart]);
+
+  return <div ref={containerRef} className="flex justify-center my-4 overflow-x-auto" />;
+};
+
+const MarkdownComponents = {
+  code(props: any) {
+    const {children, className, node, ...rest} = props;
+    const match = /language-(\w+)/.exec(className || '');
+    const language = match ? match[1] : '';
+    
+    if (language === 'mermaid') {
+      return <MermaidDiagram chart={String(children).replace(/\n$/, '')} />;
+    }
+    
+    return (
+      <code {...rest} className={className}>
+        {children}
+      </code>
+    );
+  }
+};
 
 export function LearningNotes() {
-  const { notes, addNote, updateNote, deleteNote } = useStore();
+  const { notes, addNote, updateNote, deleteNote, triggerPersistenceSync } = useStore();
   
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -91,6 +141,7 @@ export function LearningNotes() {
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this note?")) {
+      triggerPersistenceSync();
       deleteNote(id);
       if (activeNoteId === id) {
         setActiveNoteId(null);
@@ -162,11 +213,23 @@ export function LearningNotes() {
                   setActiveNoteId(note.id);
                   setIsEditing(false);
                 }}
-                className={`p-3 rounded-md cursor-pointer border transition-colors ${activeNoteId === note.id ? 'bg-bg-elevated border-accent-primary' : 'bg-transparent border-border hover:border-text-muted'}`}
+                className={`group p-3 rounded-md cursor-pointer border transition-colors ${activeNoteId === note.id ? 'bg-bg-elevated border-accent-primary' : 'bg-transparent border-border hover:border-text-muted'}`}
               >
                 <div className="flex justify-between items-start mb-1">
                   <h3 className="text-sm font-bold truncate pr-2">{note.title}</h3>
-                  <span className="text-[10px] text-text-muted shrink-0">{note.date.slice(5)}</span>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-[10px] text-text-muted">{note.date.slice(5)}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(note.id);
+                      }}
+                      className="p-1 text-text-muted hover:text-accent-danger transition-colors opacity-0 group-hover:opacity-100"
+                      title="Delete Note"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 mb-2">
                   <Badge variant="outline" className="text-[10px]">{note.subject}</Badge>
@@ -300,7 +363,7 @@ export function LearningNotes() {
                 )}
                 {(showPreview || splitView) && (
                   <div className={`h-full p-4 overflow-y-auto prose prose-invert prose-p:text-text-secondary prose-headings:text-text-primary max-w-none markdown-body text-text-primary text-sm ${splitView ? 'w-1/2' : 'w-full'}`}>
-                    {editContent ? <Markdown>{editContent}</Markdown> : <p className="text-text-muted italic">Nothing to preview</p>}
+                    {editContent ? <Markdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MarkdownComponents}>{editContent}</Markdown> : <p className="text-text-muted italic">Nothing to preview</p>}
                   </div>
                 )}
               </div>
@@ -334,7 +397,7 @@ export function LearningNotes() {
             <div className="prose prose-invert prose-p:text-text-secondary prose-headings:text-text-primary max-w-none">
               {activeNote.content ? (
                 <div className="markdown-body text-text-primary">
-                  <Markdown>{activeNote.content}</Markdown>
+                  <Markdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]} components={MarkdownComponents}>{activeNote.content}</Markdown>
                 </div>
               ) : (
                 <p className="text-text-muted italic">No content. Click Edit to add some notes.</p>

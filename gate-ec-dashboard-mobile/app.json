@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "GATE EC 2027",
+    "slug": "gate-ec-dashboard",
+    "version": "1.0.0",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTabletMode": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#0D0F14"
+      },
+      "package": "com.recgate.dashboard",
+      "versionCode": 1,
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "favicon": "./src/assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow GATE EC Dashboard to access your camera for QR code scanning"
+        }
+      ]
+    ]
+  }
+}

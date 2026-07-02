@@ -29,38 +29,7 @@ export const INITIAL_PRIORITY_BOARD = [
   { id: 'p9', title: 'BJT/MOSFET operating regions', subject: 'Electronic Devices', marksAtStake: 5, priorityLevel: 'P3', status: '🎯 On Deck' },
 ];
 
-export const INITIAL_FORMULAS = [
-  { id: 'f1', name: 'Z-transform ROC (causal)', content: '|z| > |pole|', subject: 'Signals & Systems', topic: 'Z-transform', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f2', name: 'Z-transform ROC (anti-causal)', content: '|z| < |pole|', subject: 'Signals & Systems', topic: 'Z-transform', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f3', name: 'Two-port Z-parameters V1', content: 'V1 = Z11·I1 + Z12·I2', subject: 'Networks', topic: 'Two-port Parameters', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f4', name: 'Two-port Z-parameters V2', content: 'V2 = Z21·I1 + Z22·I2', subject: 'Networks', topic: 'Two-port Parameters', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f5', name: 'Carson\'s Rule (FM Bandwidth)', content: 'BW_FM = 2(Δf + fm) = 2fm(β + 1)', subject: 'Communications', topic: 'FM Modulation', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f6', name: 'BER for BPSK', content: 'Pe = Q(√(2Eb/N0))', subject: 'Communications', topic: 'Digital Modulation', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f7', name: 'Eigenvalue sum shortcut', content: 'λ1 + λ2 + ... = trace(A)', subject: 'Engineering Mathematics', topic: 'Linear Algebra', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f8', name: 'Eigenvalue product shortcut', content: 'λ1·λ2·... = det(A)', subject: 'Engineering Mathematics', topic: 'Linear Algebra', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f9', name: 'MOSFET transconductance (gm)', content: 'gm = 2ID/(VGS - VT)', subject: 'Analog Circuits', topic: 'MOSFET Small-Signal', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f10', name: 'Barkhausen Criterion', content: '|Aβ| = 1, ∠Aβ = 0°', subject: 'Analog Circuits', topic: 'Oscillators', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f11', name: 'Shannon Capacity', content: 'C = B·log2(1 + SNR)', subject: 'Communications', topic: 'Shannon Capacity', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f12', name: 'Friis Noise Figure', content: 'Ftotal = F1 + (F2-1)/G1 + (F3-1)/(G1·G2)', subject: 'Communications', topic: 'Noise Figure', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f13', name: 'Resonant frequency', content: 'ω0 = 1/√(LC)', subject: 'Networks', topic: 'Resonance', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f14', name: 'Quality factor', content: 'Q = (1/R)√(L/C)', subject: 'Networks', topic: 'Resonance', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f15', name: 'Bayes Theorem', content: 'P(A|B) = P(B|A)·P(A)/P(B)', subject: 'Engineering Mathematics', topic: 'Probability', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f16', name: 'Cutoff frequency TE10', content: 'fc = c/(2a)', subject: 'Electromagnetics', topic: 'Waveguides', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f17', name: 'Skin depth', content: 'δ = 1/√(πfμσ)', subject: 'Electromagnetics', topic: 'Plane Wave', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f18', name: 'Reflection coefficient', content: 'Γ = (ZL - Z0)/(ZL + Z0)', subject: 'Electromagnetics', topic: 'Transmission Lines', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f19', name: 'VSWR', content: 'VSWR = (1 + |Γ|)/(1 - |Γ|)', subject: 'Electromagnetics', topic: 'Transmission Lines', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f20', name: 'Phase margin', content: 'PM = 180° + ∠G(jωgc)', subject: 'Control Systems', topic: 'Bode Plot', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f21', name: 'Velocity Error Constant', content: 'Kv = lim(s→0)[s·G(s)]', subject: 'Control Systems', topic: 'Steady-State Error', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f22', name: 'CE amp voltage gain', content: 'Av = -gm·(RC || ro)', subject: 'Analog Circuits', topic: 'BJT Small-Signal', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f23', name: 'Mod-N counter FF count', content: '⌈log2(N)⌉ flip-flops', subject: 'Digital Circuits', topic: 'Counters', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f24', name: 'Depletion width', content: 'WD ∝ √(1/NA + 1/ND)', subject: 'Electronic Devices', topic: 'p-n Junction', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f25', name: 'Body effect VT shift', content: 'VT = VT0 + γ(√|2φF + VSB| - √|2φF|)', subject: 'Electronic Devices', topic: 'MOSFET', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f26', name: 'Gradient', content: '∇f = (∂f/∂x)î + (∂f/∂y)ĵ + (∂f/∂z)k̂', subject: 'Engineering Mathematics', topic: 'Vector Calculus', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f27', name: 'Residue (simple pole)', content: 'Res = lim(z→z0)[(z-z0)·f(z)]', subject: 'Engineering Mathematics', topic: 'Complex Analysis', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f28', name: 'Circular convolution', content: 'x1[n] ⊛ x2[n] = IDFT{X1[k]·X2[k]}', subject: 'Signals & Systems', topic: 'Convolution', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f29', name: 'Nyquist rate', content: 'fs ≥ 2fmax', subject: 'Signals & Systems', topic: 'Sampling', confidence: 'Learning', lastReviewed: '' },
-  { id: 'f30', name: 'Friis transmission', content: 'Pr/Pt = GtGr(λ/4πR)²', subject: 'Electromagnetics', topic: 'Antennas', confidence: 'Learning', lastReviewed: '' }
-];
+export const INITIAL_FORMULAS = [];
 
 export const INITIAL_REMINDERS = [
   { id: 'r1', title: 'Morning Formula Review', message: 'Review yesterday\'s combat sheet before starting', time: '06:00', repeat: 'daily', active: false },

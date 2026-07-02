@@ -1,19 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useStore, Task } from '../store';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select, Badge, cn } from '../components/ui';
 import { SUBJECTS } from '../store/initialData';
-import { Check, Plus, Clock, Tag } from 'lucide-react';
+import { Check, Plus, Clock, Tag, Award, Flame, Trash2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function DailyChecklist() {
-  const { tasks, addTask, updateTask } = useStore();
+  const { tasks, addTask, updateTask, deleteTask } = useStore();
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskSubject, setNewTaskSubject] = useState(SUBJECTS[0]);
   const [newTaskPriority, setNewTaskPriority] = useState('P2');
   const [newTaskTime, setNewTaskTime] = useState('30');
   
   const [filter, setFilter] = useState<'All' | 'Pending' | 'P1' | 'P2' | 'P3'>('All');
+  const [showMissionAccomplished, setShowMissionAccomplished] = useState(false);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
   // In a real app with midnight reset, we'd have an initialization hook to check carry-over.
   // Assuming 'tasks' holds pending from previous days and completed from *today only*.
@@ -49,6 +53,59 @@ export function DailyChecklist() {
   
   const completedTasks = combinedTasks.filter(t => t.completed);
   const pendingTasks = combinedTasks.filter(t => !t.completed);
+
+  const [prevPendingCount, setPrevPendingCount] = useState(pendingTasks.length);
+
+  useEffect(() => {
+    if (combinedTasks.length > 0 && prevPendingCount > 0 && pendingTasks.length === 0) {
+      setShowMissionAccomplished(true);
+      
+      // Trigger confetti
+      const duration = 3000;
+      const end = Date.now() + duration;
+
+      const frame = () => {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#00E5FF', '#1A2942', '#FFFFFF']
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#00E5FF', '#1A2942', '#FFFFFF']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    }
+    setPrevPendingCount(pendingTasks.length);
+  }, [pendingTasks.length, combinedTasks.length, prevPendingCount]);
+
+  const calculateStreak = () => {
+     const today = new Date();
+     let streak = 0;
+     for (let i = 0; i < 365; i++) {
+        const d = new Date(today);
+        d.setDate(d.getDate() - i);
+        const dateStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+        const dayTasks = tasks.filter(t => t.date === dateStr);
+        const completed = dayTasks.filter(t => t.completed).length;
+        if (completed > 0 || (i === 0 && showMissionAccomplished)) {
+           streak++;
+        } else if (i > 0) {
+           break;
+        }
+     }
+     return Math.max(streak, 1);
+  };
 
   const displayedTasks = filter === 'All' ? combinedTasks :
                          filter === 'Pending' ? pendingTasks :
@@ -99,7 +156,46 @@ export function DailyChecklist() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      <AnimatePresence>
+        {showMissionAccomplished && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg-primary/80 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-bg-card border-2 border-accent-primary p-8 rounded-xl shadow-2xl max-w-sm w-full text-center relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent-primary via-accent-success to-accent-primary"></div>
+              <div className="w-20 h-20 bg-accent-primary/20 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-accent-primary">
+                <Award className="w-10 h-10 text-accent-primary" />
+              </div>
+              <h2 className="text-2xl font-mono font-bold text-text-primary mb-2 tracking-tighter">MISSION ACCOMPLISHED</h2>
+              <p className="text-text-secondary mb-6 text-sm">All daily targets have been successfully neutralized.</p>
+              
+              <div className="bg-bg-elevated rounded-lg p-4 mb-6 border border-border">
+                <div className="flex items-center justify-center gap-3">
+                  <Flame className="w-6 h-6 text-accent-warning" />
+                  <div className="text-left">
+                    <div className="text-[10px] text-text-secondary font-mono uppercase">Current Streak</div>
+                    <div className="text-xl font-bold font-mono text-accent-warning">{calculateStreak()} DAYS</div>
+                  </div>
+                </div>
+              </div>
+              
+              <Button onClick={() => setShowMissionAccomplished(false)} className="w-full font-bold tracking-widest text-xs h-12">
+                ACKNOWLEDGE & RETURN
+              </Button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 mb-4">
         <div>
           <h1 className="text-3xl font-mono text-text-primary">DAILY CHECKLIST</h1>
@@ -176,6 +272,17 @@ export function DailyChecklist() {
                       <Badge variant={task.priority === 'P1' ? 'danger' : task.priority === 'P2' ? 'warning' : 'outline'}>
                         {task.priority}
                       </Badge>
+                      <button
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this task?")) {
+                            deleteTask(task.id);
+                          }
+                        }}
+                        className="p-1 text-text-muted hover:text-accent-danger transition-colors ml-2"
+                        title="Delete Task"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 ))

@@ -15,7 +15,8 @@ export function ProductivityHeatmap() {
     for (let i = numDays - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      data.set(d.toISOString().split('T')[0], { completed: 0, total: 0 });
+      const localDateStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      data.set(localDateStr, { completed: 0, total: 0 });
     }
 
     // Add Tasks

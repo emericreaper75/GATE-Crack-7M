@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useStore, ErrorLog } from '../store';
 import { SUBJECTS, INITIAL_MASTERY } from '../store/initialData';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select, Badge, Textarea, cn } from '../components/ui';
-import { Plus, RotateCcw, Target, AlertOctagon } from 'lucide-react';
+import { Plus, RotateCcw, Target, AlertOctagon, Trash2 } from 'lucide-react';
 
 export function ErrorJournal() {
-  const { errors, addErrorLog, updateErrorLog } = useStore();
+  const { errors, addErrorLog, updateErrorLog, deleteErrorLog } = useStore();
   const [view, setView] = useState<'all' | 'pending' | 'add' | 'weekly'>('pending');
 
   // Form
@@ -242,6 +242,18 @@ export function ErrorJournal() {
                           <Target className="w-3 h-3 mr-1" /> Mark Mastered
                         </Button>
                       )}
+                      
+                      <button
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this error log?")) {
+                            deleteErrorLog(e.id);
+                          }
+                        }}
+                        className="p-1 text-text-muted hover:text-accent-danger transition-colors ml-2"
+                        title="Delete Log"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm mt-4 pt-4 border-t border-border">

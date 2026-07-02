@@ -6,10 +6,10 @@ import { Plus, TrendingUp, Target } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, BarChart, Bar, Legend, Cell, PieChart, Pie } from 'recharts';
 
 export function MockAnalyzer() {
-  const { mocks, addMock } = useStore();
+  const { mocks, addMock, deleteMock, triggerPersistenceSync } = useStore();
   const [view, setView] = useState<'dashboard' | 'add'>('dashboard');
 
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0]);
   const [type, setType] = useState('Full Mock');
   const [source, setSource] = useState('ACE Engineering Academy');
   const [overallScore, setOverallScore] = useState('');
@@ -307,6 +307,7 @@ export function MockAnalyzer() {
                             <th className="px-4 py-3 font-medium">Score</th>
                             <th className="px-4 py-3 font-medium">Acc.</th>
                             <th className="px-4 py-3 font-medium">Top Err</th>
+                            <th className="px-4 py-3 font-medium text-right">Action</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
@@ -320,12 +321,26 @@ export function MockAnalyzer() {
                               maxErrVal === errs.time ? 'Time' : 'Silly';
                             
                             return (
-                              <tr key={m.id} className="hover:bg-bg-elevated/50 transition-colors">
+                              <tr key={m.id} className="hover:bg-bg-elevated/50 transition-colors group">
                                 <td className="px-4 py-3 font-mono">{m.date.slice(5)}</td>
                                 <td className="px-4 py-3 text-text-secondary truncate max-w-[100px]">{m.type}</td>
                                 <td className="px-4 py-3 font-mono font-bold text-accent-primary">{m.overallScore}</td>
                                 <td className="px-4 py-3 text-text-secondary">{acc}%</td>
                                 <td className="px-4 py-3 text-xs">{topErr}</td>
+                                <td className="px-4 py-3 text-right">
+                                  <button
+                                    onClick={() => {
+                                      if (confirm("Are you sure you want to delete this mock record?")) {
+                                        triggerPersistenceSync();
+                                        deleteMock(m.id);
+                                      }
+                                    }}
+                                    className="p-1 text-text-muted hover:text-accent-danger transition-colors opacity-0 group-hover:opacity-100"
+                                    title="Delete Mock"
+                                  >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                  </button>
+                                </td>
                               </tr>
                             );
                           })}

@@ -15,7 +15,8 @@ export function ActivityHeatmap() {
     for (let i = numDays - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
-      data.set(d.toISOString().split('T')[0], 0);
+      const localDateStr = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+      data.set(localDateStr, 0);
     }
 
     // Add PYQs

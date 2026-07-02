@@ -2,10 +2,16 @@ import React, { useState } from 'react';
 import { useStore, Formula } from '../store';
 import { SUBJECTS } from '../store/initialData';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select, Badge, cn, Textarea } from '../components/ui';
-import { Layers, Plus, Eye, EyeOff } from 'lucide-react';
+import { Layers, Plus, Eye, EyeOff, Trash2 } from 'lucide-react';
+import Markdown from 'react-markdown';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
+
+import remarkGfm from 'remark-gfm';
 
 export function FormulaSheets() {
-  const { formulas, addFormula, updateFormula } = useStore();
+  const { formulas, addFormula, updateFormula, deleteFormula, triggerPersistenceSync } = useStore();
   const [activeSubject, setActiveSubject] = useState(SUBJECTS[0]);
   const [reviewMode, setReviewMode] = useState(false);
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
@@ -92,7 +98,7 @@ export function FormulaSheets() {
             </div>
             <div className="md:col-span-2">
               <label className="text-xs text-text-secondary mb-1 block">Content (Formula)</label>
-              <Input value={newContent} onChange={e => setNewContent(e.target.value)} placeholder="e.g. BW = 2(Δf + fm)" className="font-mono text-accent-primary" />
+              <Textarea value={newContent} onChange={e => setNewContent(e.target.value)} placeholder="e.g. $$ BW = 2(\Delta f + f_m) $$" className="font-mono text-accent-primary min-h-[40px] resize-y" />
             </div>
             <div className="md:col-span-1 flex items-end">
               <Button onClick={handleAdd} className="w-full">Save to Arsenal</Button>
@@ -121,8 +127,8 @@ export function FormulaSheets() {
                     
                     {revealed[f.id] ? (
                       <div className="w-full animate-in zoom-in-95 duration-200">
-                        <div className="bg-bg-elevated p-6 rounded-lg mb-8 font-mono text-xl text-accent-primary border border-border">
-                          {f.content}
+                        <div className="bg-bg-elevated p-6 rounded-lg mb-8 font-mono text-xl text-accent-primary border border-border prose prose-invert prose-p:text-accent-primary prose-headings:text-text-primary max-w-none markdown-body">
+                          <Markdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{f.content}</Markdown>
                         </div>
                         <div className="flex gap-4 justify-center w-full">
                           <Button variant="danger" onClick={() => { markConfidence(f.id, 'Shaky'); toggleReveal(f.id); }} className="flex-1">Shaky</Button>
@@ -152,10 +158,23 @@ export function FormulaSheets() {
                     {f.confidence}
                   </Badge>
                   <span className="text-[10px] font-mono text-text-muted">Last: {f.lastReviewed || 'Never'}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this formula?")) {
+                        triggerPersistenceSync();
+                        deleteFormula(f.id);
+                      }
+                    }}
+                    className="p-1 text-text-muted hover:text-accent-danger transition-colors opacity-0 group-hover:opacity-100 ml-2"
+                    title="Delete Formula"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                 </div>
                 <h4 className="text-sm font-bold text-text-primary mb-3">{f.name}</h4>
-                <div className="bg-bg-elevated rounded-md p-3 font-mono text-sm text-accent-primary flex-1 flex items-center justify-center text-center border border-transparent group-hover:border-border transition-colors">
-                  {f.content}
+                <div className="bg-bg-elevated rounded-md p-3 font-mono text-sm text-accent-primary flex-1 flex items-center justify-center text-center border border-transparent group-hover:border-border transition-colors prose prose-invert prose-p:text-accent-primary prose-headings:text-text-primary max-w-none markdown-body overflow-x-auto">
+                  <Markdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{f.content}</Markdown>
                 </div>
               </div>
             ))}

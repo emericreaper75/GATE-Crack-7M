@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useStore } from "../../store";
 import { cn } from "../ui";
+import { Toaster } from "sonner";
 import {
   Home,
   CheckSquare,
@@ -18,7 +19,8 @@ import {
   ChevronRight,
   Clock,
   Menu,
-  X
+  X,
+  Timer
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -27,6 +29,7 @@ export const NAV_ITEMS = [
   { id: "strategic-plan", label: "Strategic Plan", icon: Map },
   { id: "learning-notes", label: "Learning Notes", icon: BookOpen },
   { id: "spaced-repetition", label: "Spaced Repetition", icon: Clock },
+  { id: "focus-timer", label: "Focus Timer", icon: Timer },
   { id: "reminders", label: "Reminders", icon: Bell },
   { id: "priority-board", label: "Priority Board", icon: Target },
   { id: "subject-tracker", label: "Subject Tracker", icon: BarChart2 },
@@ -107,7 +110,10 @@ export function AppLayout({
 
   return (
     <div className="flex h-screen w-full bg-bg-primary text-text-primary overflow-hidden font-sans">
-      
+      <Toaster position="bottom-right" toastOptions={{
+        style: { background: '#1A2942', color: '#E0E6ED', border: '1px solid #334B68' },
+        className: 'font-sans'
+      }} />
       {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
         <div 

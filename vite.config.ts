@@ -6,13 +6,27 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    base: './',
     plugins: [
+      {
+        name: 'fix-ws-send',
+        configureServer(server) {
+          if (server.ws && !server.ws.send) {
+            server.ws.send = () => {};
+          } else if (!server.ws) {
+            server.ws = { send: () => {}, on: () => {}, off: () => {} } as any;
+          }
+        }
+      },
       react(), 
       tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
+        workbox: {
+          maximumFileSizeToCacheInBytes: 5000000
+        },
         devOptions: {
-          enabled: true
+          enabled: false
         },
         manifest: {
           name: 'GATE EC 2027 Dashboard',

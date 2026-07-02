@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useStore, PriorityCard } from '../store';
 import { SUBJECTS } from '../store/initialData';
 import { Button, Input, Select, Badge, cn } from '../components/ui';
-import { Plus, GripVertical } from 'lucide-react';
+import { Plus, GripVertical, Trash2 } from 'lucide-react';
 
 const COLUMNS = ['⚡ Daily Drill', '📌 This Week', '🎯 On Deck', '✅ Done'] as const;
 
 export function PriorityBoard() {
-  const { priorityBoard, addPriorityCard, updatePriorityCard } = useStore();
+  const { priorityBoard, addPriorityCard, updatePriorityCard, deletePriorityCard } = useStore();
   const [showAdd, setShowAdd] = useState(false);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState(SUBJECTS[0]);
@@ -74,6 +74,18 @@ export function PriorityBoard() {
                 </Badge>
                 <div className="flex items-center gap-1 text-xs font-mono text-text-muted">
                   <span className="text-accent-success font-bold">+{card.marksAtStake}</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm("Are you sure you want to delete this card?")) {
+                        deletePriorityCard(card.id);
+                      }
+                    }}
+                    className="p-0.5 text-text-muted hover:text-accent-danger transition-colors opacity-0 group-hover:opacity-100"
+                    title="Delete Card"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
                   <GripVertical className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>

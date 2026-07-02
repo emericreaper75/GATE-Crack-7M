@@ -15,10 +15,8 @@ import { TargetProgressGauge } from "../components/TargetProgressGauge";
 export function Dashboard() {
   const { tasks, pyqLogs, errors, mastery, settings } = useStore();
 
-  const todayStr = new Date().toISOString().split("T")[0];
-
-  // Countdowns
   const today = new Date();
+  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split("T")[0];
   const gateDate = new Date("2027-02-14");
   const daysToGate = Math.max(
     0,
@@ -73,7 +71,7 @@ export function Dashboard() {
 
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - today.getDay());
-  const startOfWeekStr = startOfWeek.toISOString().split("T")[0];
+  const startOfWeekStr = new Date(startOfWeek.getTime() - startOfWeek.getTimezoneOffset() * 60000).toISOString().split("T")[0];
   const errorJournalEntriesThisWeek = errors.filter(
     (e) => e.date >= startOfWeekStr,
   ).length;

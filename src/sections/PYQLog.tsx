@@ -2,10 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useStore, PYQLog as PYQLogType } from '../store';
 import { SUBJECTS, INITIAL_MASTERY } from '../store/initialData';
 import { Card, CardContent, CardHeader, CardTitle, Button, Input, Select, Badge, cn } from '../components/ui';
-import { Plus, Target, Check, X, SkipForward, BarChart } from 'lucide-react';
+import { Plus, Target, Check, X, SkipForward, BarChart, Trash2 } from 'lucide-react';
 
 export function PYQLog() {
-  const { pyqLogs, addPYQLog, settings, updateSettings } = useStore();
+  const { pyqLogs, addPYQLog, deletePYQLog, settings, updateSettings, triggerPersistenceSync } = useStore();
   const [view, setView] = useState<'log' | 'stats'>('log');
   
   // Form state
@@ -29,7 +29,7 @@ export function PYQLog() {
     if (!timeTaken) return;
     addPYQLog({
       id: Date.now().toString(),
-      date: new Date().toISOString().split('T')[0],
+      date: new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().split('T')[0],
       subject,
       topic,
       year,
@@ -54,7 +54,8 @@ export function PYQLog() {
     ? Math.round(twoMarkCorrect.reduce((acc, curr) => acc + curr.timeTaken, 0) / twoMarkCorrect.length) 
     : 0;
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
   const todaysCount = pyqLogs.filter(l => l.date === todayStr).length;
 
   const weakSpots = useMemo(() => {
@@ -203,6 +204,18 @@ export function PYQLog() {
                         <div className="flex gap-2">
                           <Badge variant="outline" className="text-[10px]">{log.timeTaken}s</Badge>
                           <Badge variant="outline" className="text-[10px]">{log.marksType}</Badge>
+                          <button
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this log?")) {
+                                triggerPersistenceSync();
+                                deletePYQLog(log.id);
+                              }
+                            }}
+                            className="p-0.5 text-text-muted hover:text-accent-danger transition-colors"
+                            title="Delete Log"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
                         </div>
                       </div>
                       {(log.errorType || log.notes) && (

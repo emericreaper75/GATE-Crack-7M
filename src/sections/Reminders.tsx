@@ -129,7 +129,16 @@ export function Reminders() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => deleteReminder(r.id)} className="text-text-muted hover:text-accent-danger">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={() => {
+                      if (confirm("Are you sure you want to delete this reminder?")) {
+                        deleteReminder(r.id);
+                      }
+                    }} 
+                    className="text-text-muted hover:text-accent-danger"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>

@@ -29,12 +29,13 @@ function computeNextSRS(srs: SRSData | undefined, quality: number): SRSData {
   
   const nextDate = new Date();
   nextDate.setDate(nextDate.getDate() + interval);
+  const localNextDateStr = new Date(nextDate.getTime() - nextDate.getTimezoneOffset() * 60000).toISOString().split('T')[0];
   
   return {
     interval,
     repetition,
     efactor,
-    nextReviewDate: nextDate.toISOString().split('T')[0]
+    nextReviewDate: localNextDateStr
   };
 }
 
@@ -46,7 +47,8 @@ type ReviewItem =
 
 export function SpacedRepetition() {
   const store = useStore();
-  const todayStr = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  const todayStr = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().split('T')[0];
 
   const reviewQueue = useMemo(() => {
     const queue: ReviewItem[] = [];
